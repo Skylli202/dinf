@@ -134,6 +134,7 @@ func TestDirSizeErrorOnReadDir(t *testing.T) {
 	}
 }
 
+// Test FileCount and FileCountR
 func TestFileCount(t *testing.T) {
 	t.Run("FileCount error test cases", func(t *testing.T) {
 		testcases := []struct {
@@ -199,6 +200,74 @@ func TestFileCount(t *testing.T) {
 			got, err := dirs.FileCount(tc.fsys)
 			assert.Nil(t, err, tc.msg)
 			assert.Equal(t, tc.expectedCount, got, tc.msg)
+		}
+	})
+
+	t.Run("FileCountR error free test cases", func(t *testing.T) {
+		testcases := []struct {
+			fsys          fstest.MapFS
+			msg           string
+			expectedCount int
+		}{
+			{
+				fsys:          fstest.MapFS{},
+				msg:           "Empty directory should return a file count of 0.",
+				expectedCount: 0,
+			},
+			{
+				fsys: fstest.MapFS{
+					"folder_1": &fstest.MapFile{Mode: fs.ModeDir},
+					"folder_2": &fstest.MapFile{Mode: fs.ModeDir},
+					"folder_3": &fstest.MapFile{Mode: fs.ModeDir},
+				},
+				msg:           "Directory that contain only directories should return a recusive file count of 0.",
+				expectedCount: 0,
+			},
+			{
+				fsys: fstest.MapFS{
+					"file_1": &fstest.MapFile{},
+				},
+				msg:           "Directory with single file should return a file count of 1.",
+				expectedCount: 1,
+			},
+			{
+				fsys: fstest.MapFS{
+					"folder_1/file_1": &fstest.MapFile{Data: []byte("123")},
+				},
+				msg:           "Directory with a single subdirectory and a single file should return a file count of 1.",
+				expectedCount: 1,
+			},
+			{
+				fsys: fstest.MapFS{
+					"folder_1/file_1": &fstest.MapFile{Data: []byte("123")},
+					"fake_folder_2":   &fstest.MapFile{Mode: fs.ModeDir},
+				},
+				msg:           "Directory with two subdirectories, one with a single file and one empty, should return a file count of 1.",
+				expectedCount: 1,
+			},
+			{
+				fsys: fstest.MapFS{
+					"folder_1/file_1": &fstest.MapFile{Data: []byte("123")},
+					"folder_2/file_2": &fstest.MapFile{Data: []byte("123")},
+				},
+				msg:           "Directory with two subdirectories, with a single file in each, should return a file count of 2.",
+				expectedCount: 2,
+			},
+			{
+				fsys: fstest.MapFS{
+					"folder_1/file_1": &fstest.MapFile{Data: []byte("123")},
+					"folder_1/file_3": &fstest.MapFile{Data: []byte("123")},
+					"folder_2/file_2": &fstest.MapFile{Data: []byte("123")},
+				},
+				msg:           "Directory with two subdirectories, with one or more file in each, should return a file count of 3.",
+				expectedCount: 3,
+			},
+		}
+
+		for _, tc := range testcases {
+			got, err := dirs.FileCountR(tc.fsys)
+			assert.Nil(t, err, tc.msg)
+			assert.Equal(t, tc.expectedCount, got, tc.msg, tc.fsys)
 		}
 	})
 }

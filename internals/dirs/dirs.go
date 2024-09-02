@@ -54,3 +54,16 @@ func FileCount(fsys fs.FS) (int, error) {
 
 	return dirCounts, nil
 }
+func FileCountR(fsys fs.FS) (int, error) {
+	dirCounts := 0
+	// FIX: Implement test cases for [fs.WalkDir] returning an error
+	_ = fs.WalkDir(fsys, ".", func(path string, d fs.DirEntry, err error) error {
+		// FIX: Implement test cases for err not nil in the WalkDirFunc
+		if !d.IsDir() {
+			dirCounts += 1
+		}
+
+		return nil
+	})
+	return dirCounts, nil
+}
