@@ -190,7 +190,7 @@ func TestFileCount(t *testing.T) {
 				fsys: fstest.MapFS{
 					"file_1": &fstest.MapFile{Data: []byte("123")},
 				},
-				msg:           "Directory with single file should return a file count of 0.",
+				msg:           "Directory with single file should return a file count of 1.",
 				expectedCount: 1,
 			},
 		}
