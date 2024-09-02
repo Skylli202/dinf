@@ -39,6 +39,9 @@ func DirSize(fsys fs.FS) (int64, error) {
 	return dirSize, nil
 }
 
+// FileCountR count the files located at the root of the given file system. If
+// the FS has subdirectories it will NOT traverse them. See [FileCountR] for a
+// recursive function.
 func FileCount(fsys fs.FS) (int, error) {
 	dirents, err := fs.ReadDir(fsys, ".")
 	if err != nil {
@@ -54,6 +57,10 @@ func FileCount(fsys fs.FS) (int, error) {
 
 	return dirCounts, nil
 }
+
+// FileCount count the files located in the given file system. If the FS has
+// subdirectories it will traverse them. See [FileCount] for a none recursive
+// function.
 func FileCountR(fsys fs.FS) (int, error) {
 	dirCounts := 0
 	// FIX: Implement test cases for [fs.WalkDir] returning an error
