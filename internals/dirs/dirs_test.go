@@ -93,12 +93,9 @@ type (
 
 func (fsys mMapFS) ReadDir(name string) ([]fs.DirEntry, error) {
 	err, ok := fsys.errors[name]
-	fmt.Printf("fsys.errors[%s]: %v, %t\n", name, err, ok)
 	if ok {
 		return make([]fs.DirEntry, 0), err
 	}
-
-	fmt.Printf("[TEST] fsys.ReadDir(%s)\n", name)
 
 	// For now, return an empty DirEntry slices.
 	dirents, err := fsys.MapFS.ReadDir(name)
@@ -107,18 +104,6 @@ func (fsys mMapFS) ReadDir(name string) ([]fs.DirEntry, error) {
 	}
 
 	results := make([]fs.DirEntry, len(dirents))
-	// for _, v := range dirents {
-	// 	e, ok := fsys.errors[v.Name()]
-	// 	if ok {
-	// 		results = append(results, mDirEntry{
-	// 			DirEntry: v,
-	// 			err:      e,
-	// 		})
-	// 	} else {
-	// 		results = append(results, mDirEntry{v, nil})
-	// 	}
-	// }
-
 	return results, nil
 }
 
@@ -147,11 +132,9 @@ func TestDirSizeErrorOnReadDir(t *testing.T) {
 	for i, tc := range cases {
 		size, err := dirs.DirSize(tc.fs)
 
-		fmt.Printf("DirSize: %d, %v\n", size, err)
 		assert.NotNil(t, err, fmt.Sprintf("DirSize should return an error not Nil, test case: [%d] %s", i, tc.msg))
 		assert.Equal(t, tc.expectedError, err, tc.msg)
 		assert.Equal(t, int64(0), size, tc.msg)
-		fmt.Println("---")
 	}
 }
 
