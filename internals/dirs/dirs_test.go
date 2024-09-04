@@ -12,37 +12,42 @@ import (
 
 func TestDirSize(t *testing.T) {
 	cases := []struct {
-		fs           fstest.MapFS
-		msg          string
-		expectedSize int64
+		fs            fstest.MapFS
+		msg           string
+		expectedSize  int64
+		expectedSizeR int64
 	}{
 		{
-			fs:           fstest.MapFS{},
-			msg:          "Empty FS should have a size of 0.",
-			expectedSize: 0,
+			fs:            fstest.MapFS{},
+			msg:           "Empty file system.",
+			expectedSize:  0,
+			expectedSizeR: 0,
 		},
 		{
 			fs: fstest.MapFS{
 				"foo": &fstest.MapFile{Data: []byte("123")},
 			},
-			msg:          "Single file FS should have a size of 3.",
-			expectedSize: 3,
+			msg:           "Single file in root directory.",
+			expectedSize:  3,
+			expectedSizeR: 3,
 		},
 		{
 			fs: fstest.MapFS{
 				"foo": &fstest.MapFile{Data: []byte("123")},
 				"bar": &fstest.MapFile{Data: []byte("456")},
 			},
-			msg:          "Two files FS should have a size of 6.",
-			expectedSize: 6,
+			msg:           "Two files in root directory.",
+			expectedSize:  6,
+			expectedSizeR: 6,
 		},
 		{
 			fs: fstest.MapFS{
 				"foo": &fstest.MapFile{Mode: fs.ModeDir},
 				"bar": &fstest.MapFile{Mode: fs.ModeDir},
 			},
-			msg:          "A file system with only directories should have a size of 0.",
-			expectedSize: 0,
+			msg:           "Two empty directories.",
+			expectedSize:  0,
+			expectedSizeR: 0,
 		},
 		{
 			fs: fstest.MapFS{
@@ -50,16 +55,32 @@ func TestDirSize(t *testing.T) {
 				"foo/foo": &fstest.MapFile{Data: []byte("123")},
 				"bar":     &fstest.MapFile{Mode: fs.ModeDir},
 			},
-			msg:          "It should only look at direct child (i.e. ignore subdirectories files).",
-			expectedSize: 0,
+			msg:           "A single file in a sub-directory.",
+			expectedSize:  0,
+			expectedSizeR: 3,
+		},
+		{
+			fs: fstest.MapFS{
+				"file_1":          &fstest.MapFile{Data: []byte("123")},
+				"file_2":          &fstest.MapFile{Data: []byte("123")},
+				"folder_1/file_1": &fstest.MapFile{Data: []byte("12345")},
+				"folder_2/file_1": &fstest.MapFile{Data: []byte("12345")},
+				"folder_3/file_1": &fstest.MapFile{Data: []byte("12345")},
+			},
+			msg:           "Two files in root directory, three files in subdirectories with no empty directories.",
+			expectedSize:  6,
+			expectedSizeR: 21,
 		},
 	}
 
 	for i, tc := range cases {
 		size, err := dirs.DirSize(tc.fs)
+		sizeR, errR := dirs.DirSizeR(tc.fs)
 
 		assert.Nil(t, err, fmt.Sprintf("DirSize should return err equals to Nil, but it is not for test case: [%d] %s", i, tc.msg))
-		assert.Equal(t, tc.expectedSize, size, tc.msg)
+		assert.Nil(t, errR, fmt.Sprintf("DirSizeR should return err equals to Nil, but it is not for test case: [%d] %s", i, tc.msg))
+		assert.Equal(t, tc.expectedSize, size, fmt.Sprintf("Size does not match.\nTest case: %d - %q.\nTest case's file system:\n%+v\n", i, tc.msg, tc.fs))
+		assert.Equal(t, tc.expectedSizeR, sizeR, fmt.Sprintf("SizeR does not match.\nTest case: %d - %q.\nTest case's file system:\n%+v\n", i, tc.msg, tc.fs))
 	}
 }
 

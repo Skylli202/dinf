@@ -39,6 +39,22 @@ func DirSize(fsys fs.FS) (int64, error) {
 	return dirSize, nil
 }
 
+func DirSizeR(fsys fs.FS) (int64, error) {
+	dirSize := int64(0)
+	// FIX: Implement test cases for [fs.WalkDir] returning an error
+	_ = fs.WalkDir(fsys, ".", func(path string, d fs.DirEntry, err error) error {
+		// FIX: Implement test cases for err not nil in the WalkDirFunc
+
+		if !d.IsDir() {
+			// FIX: Implement test cases for err not nil upon [fs.FileInfo.Info()]
+			info, _ := d.Info()
+			dirSize += info.Size()
+		}
+		return nil
+	})
+	return dirSize, nil
+}
+
 // FileCountR count the files located at the root of the given file system. If
 // the FS has subdirectories it will NOT traverse them. See [FileCountR] for a
 // recursive function.
