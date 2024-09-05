@@ -1,6 +1,6 @@
 package main
 
-import "go-dinf/cmd"
+import "dinf/cmd"
 
 func main() {
 	cmd.Execute()

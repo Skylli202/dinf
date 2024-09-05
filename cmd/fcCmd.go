@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"go-dinf/internals"
+	"dinf/internals"
 	"io/fs"
 	"os"
 
@@ -12,7 +12,7 @@ func NewFcCmd(fsys fs.FS) *cobra.Command {
 	fcCmd := &cobra.Command{
 		Use:        "fc",
 		Aliases:    []string{"file_count", "fileCount", "FileCount", "Filecount", "filecount"},
-		Example:    `go-dinf fc`,
+		Example:    `dinf fc`,
 		SuggestFor: []string{"cf"},
 		Short:      "Count the file in the current directory.",
 		// Long:       "",

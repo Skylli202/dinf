@@ -1,4 +1,4 @@
-module go-dinf
+module dinf
 
 go 1.22.0
 

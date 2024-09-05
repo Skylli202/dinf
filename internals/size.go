@@ -1,7 +1,7 @@
 package internals
 
 import (
-	"go-dinf/internals/dirs"
+	"dinf/internals/dirs"
 	"io"
 	"io/fs"
 	"text/template"

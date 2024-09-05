@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"go-dinf/internals"
+	"dinf/internals"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -10,7 +10,7 @@ import (
 var sizeCmd = &cobra.Command{
 	Use:        "size",
 	Aliases:    []string{},
-	Example:    `go-dinf size`,
+	Example:    `dinf size`,
 	SuggestFor: []string{"szie", "siez"},
 	Short:      "Compute the size (in bytes) of the files in the current directory.",
 	// Long:       "",

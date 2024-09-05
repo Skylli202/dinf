@@ -3,7 +3,7 @@ package internals_test
 import (
 	"bytes"
 	"fmt"
-	"go-dinf/internals"
+	"dinf/internals"
 	"io/fs"
 	"testing"
 	"testing/fstest"

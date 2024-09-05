@@ -2,7 +2,7 @@ package internals
 
 import (
 	"fmt"
-	"go-dinf/internals/dirs"
+	"dinf/internals/dirs"
 	"io"
 	"io/fs"
 )

@@ -3,8 +3,8 @@ package cmd_test
 import (
 	"bytes"
 	"fmt"
-	"go-dinf/cmd"
-	"go-dinf/internals"
+	"dinf/cmd"
+	"dinf/internals"
 	"io"
 	"io/fs"
 	"testing"

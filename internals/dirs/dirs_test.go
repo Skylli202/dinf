@@ -2,7 +2,7 @@ package dirs_test
 
 import (
 	"fmt"
-	"go-dinf/internals/dirs"
+	"dinf/internals/dirs"
 	"io/fs"
 	"testing"
 	"testing/fstest"
