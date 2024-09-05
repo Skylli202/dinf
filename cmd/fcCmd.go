@@ -18,16 +18,23 @@ func NewFcCmd(fsys fs.FS) *cobra.Command {
 		// Long:       "",
 		Args: cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			R, err := cmd.Flags().GetBool("recursive")
+			w := cmd.OutOrStdout()
+
+			recursive, err := cmd.Flags().GetBool("recursive")
+			if err != nil {
+				return err
+			}
+			raw, err := cmd.Flags().GetBool("raw")
 			if err != nil {
 				return err
 			}
 
-			if R {
-				internals.FileCountRCmd(cmd.OutOrStdout(), fsys)
-			} else {
-				internals.FileCountCmd(cmd.OutOrStdout(), fsys)
+			opts := internals.FileCountOpts{
+				Recursive: recursive,
+				Raw:       raw,
 			}
+
+			internals.FileCount(w, fsys, opts)
 
 			return nil
 		},
@@ -38,6 +45,13 @@ func NewFcCmd(fsys fs.FS) *cobra.Command {
 		"R",
 		false,
 		"By default, fileCount (fc) command look only at the direct child of the current working directory. If the recursive flag is specified, fileCount will travers all the file tree.",
+	)
+
+	fcCmd.Flags().BoolP(
+		"raw",
+		"r",
+		false,
+		"Output only the file count instead of a human friendly sentence.",
 	)
 
 	return fcCmd

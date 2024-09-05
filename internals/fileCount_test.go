@@ -1,41 +1,11 @@
 package internals_test
 
 import (
-	"bytes"
-	"fmt"
-	"go-dinf/internals"
 	"testing"
-	"testing/fstest"
 )
 
+// NOTE: After refactoring I think FileCount is fully tested by the go-dinf/cmd_test package.
+// This function is just a wrapper (and formatter to an io.Writer) of the [go-ding/dirs] package,
+// which has its own tests.
 func TestFileCount(t *testing.T) {
-	t.Run("No file in file system", func(t *testing.T) {
-		fsys := fstest.MapFS{}
-
-		buf := bytes.Buffer{}
-		internals.FileCountCmd(&buf, fsys)
-
-		got := buf.String()
-		want := fmt.Sprintf("Folder contains: %d files.\n", 0)
-
-		if got != want {
-			t.Errorf("got: %q, want: %q", got, want)
-		}
-	})
-
-	t.Run("Single file in file system", func(t *testing.T) {
-		fsys := fstest.MapFS{
-			"foo": &fstest.MapFile{Data: []byte("123")},
-		}
-
-		buf := bytes.Buffer{}
-		internals.FileCountCmd(&buf, fsys)
-
-		got := buf.String()
-		want := fmt.Sprintf("Folder contains: %d files.\n", 1)
-
-		if got != want {
-			t.Errorf("got: %q, want: %q", got, want)
-		}
-	})
 }

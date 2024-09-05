@@ -7,14 +7,28 @@ import (
 	"io/fs"
 )
 
-func FileCountCmd(w io.Writer, fsys fs.FS) {
-	fileCount, _ := dirs.FileCount(fsys)
-	fmt.Fprintf(w, "Folder contains: %d files.\n", fileCount)
+const (
+	FileCountFormat    = "Folder contains: %d files.\n"
+	FileCountRawFormat = "%d\n"
+)
+
+type FileCountOpts struct {
+	Recursive bool
+	Raw       bool
 }
 
-// NOTE: With the new way of testing the command itself I'm not too sure if that
-// code is still useful, or not.
-func FileCountRCmd(w io.Writer, fsys fs.FS) {
-	fileCount, _ := dirs.FileCountR(fsys)
-	fmt.Fprintf(w, "Folder contains: %d files.\n", fileCount)
+func FileCount(w io.Writer, fsys fs.FS, opts FileCountOpts) {
+	var fileCount int
+	if opts.Recursive {
+		fileCount, _ = dirs.FileCountR(fsys)
+	} else {
+		fileCount, _ = dirs.FileCount(fsys)
+	}
+
+	format := FileCountFormat
+	if opts.Raw {
+		format = FileCountRawFormat
+	}
+
+	fmt.Fprintf(w, format, fileCount)
 }

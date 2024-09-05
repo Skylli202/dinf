@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"go-dinf/cmd"
+	"go-dinf/internals"
 	"io"
 	"io/fs"
 	"testing"
@@ -15,14 +16,13 @@ import (
 var emptyFS = fstest.MapFS{}
 
 func Test_NewFcCmd(t *testing.T) {
-	t.Run("FcCmd should have a recursive Flag of type Bool", func(t *testing.T) {
+	t.Run("FcCmd should have a recursive flag of type Bool", func(t *testing.T) {
 		fcCmd := cmd.NewFcCmd(emptyFS)
 		_, err := fcCmd.Flags().GetBool("recursive")
 		fcCmd.Execute()
 		assert.NoError(t, err, "FcCmd should have a recursive flag")
 	})
-
-	t.Run("By default, recursive Flag should be false", func(t *testing.T) {
+	t.Run("By default, recursive flag should be false", func(t *testing.T) {
 		fcCmd := cmd.NewFcCmd(emptyFS)
 		b, err := fcCmd.Flags().GetBool("recursive")
 		fcCmd.Execute()
@@ -30,8 +30,7 @@ func Test_NewFcCmd(t *testing.T) {
 			assert.False(t, b, "recursive flag should be flase by default")
 		}
 	})
-
-	t.Run("--recursive should pass the flag to true", func(t *testing.T) {
+	t.Run("--recursive should pass the flag recursive to true", func(t *testing.T) {
 		fcCmd := cmd.NewFcCmd(emptyFS)
 		fcCmd.SetArgs([]string{"--recursive"})
 		fcCmd.Execute()
@@ -40,14 +39,46 @@ func Test_NewFcCmd(t *testing.T) {
 			assert.True(t, b, "recursive flag should be true if '--recursive' is specified in the args")
 		}
 	})
-
-	t.Run("-R should pass the flag to true", func(t *testing.T) {
+	t.Run("-R should pass the flag recursive to true", func(t *testing.T) {
 		fcCmd := cmd.NewFcCmd(emptyFS)
 		fcCmd.SetArgs([]string{"-R"})
 		fcCmd.Execute()
 		b, err := fcCmd.Flags().GetBool("recursive")
 		if assert.NoError(t, err, "FcCmd should have a recursive flag") {
-			assert.True(t, b, "recursive flag should be true if '--recursive' is specified in the args")
+			assert.True(t, b, "recursive flag should be true if '-R' is specified in the args")
+		}
+	})
+
+	t.Run("FcCmd should have a raw flag of type Bool", func(t *testing.T) {
+		fcCmd := cmd.NewFcCmd(emptyFS)
+		_, err := fcCmd.Flags().GetBool("raw")
+		fcCmd.Execute()
+		assert.NoError(t, err)
+	})
+	t.Run("By default, raw flag should be false", func(t *testing.T) {
+		fcCmd := cmd.NewFcCmd(emptyFS)
+		b, err := fcCmd.Flags().GetBool("raw")
+		fcCmd.Execute()
+		if assert.NoError(t, err, "FcCmd should have a raw flag") {
+			assert.False(t, b, "raw flag should be flase by default")
+		}
+	})
+	t.Run("--raw should pass the flag raw to true", func(t *testing.T) {
+		fcCmd := cmd.NewFcCmd(emptyFS)
+		fcCmd.SetArgs([]string{"--raw"})
+		fcCmd.Execute()
+		b, err := fcCmd.Flags().GetBool("raw")
+		if assert.NoError(t, err, "FcCmd should have a raw flag") {
+			assert.True(t, b, "raw flag should be true if '--raw' is specified in the args")
+		}
+	})
+	t.Run("-r should pass the flag raw to true", func(t *testing.T) {
+		fcCmd := cmd.NewFcCmd(emptyFS)
+		fcCmd.SetArgs([]string{"-r"})
+		fcCmd.Execute()
+		b, err := fcCmd.Flags().GetBool("raw")
+		if assert.NoError(t, err, "FcCmd should have a raw flag") {
+			assert.True(t, b, "raw flag should be true if '-r' is specified in the args")
 		}
 	})
 }
@@ -55,34 +86,34 @@ func Test_NewFcCmd(t *testing.T) {
 func Test_FcCmdExecute(t *testing.T) {
 	testcases := []struct {
 		fsys     fstest.MapFS
+		expected string
 		args     []string
-		expected int
 	}{
 		{
 			fsys:     fstest.MapFS{},
+			expected: fmt.Sprintf(internals.FileCountFormat, 0),
 			args:     []string{},
-			expected: 0,
 		},
 		{
 			fsys:     fstest.MapFS{},
+			expected: fmt.Sprintf(internals.FileCountFormat, 0),
 			args:     []string{"--recursive"},
-			expected: 0,
 		},
 		{
 			fsys: fstest.MapFS{
 				"file_1": &fstest.MapFile{},
 				"file_2": &fstest.MapFile{},
 			},
+			expected: fmt.Sprintf(internals.FileCountFormat, 2),
 			args:     []string{},
-			expected: 2,
 		},
 		{
 			fsys: fstest.MapFS{
 				"file_1": &fstest.MapFile{},
 				"file_2": &fstest.MapFile{},
 			},
+			expected: fmt.Sprintf(internals.FileCountFormat, 2),
 			args:     []string{"--recursive"},
-			expected: 2,
 		},
 		{
 			fsys: fstest.MapFS{
@@ -90,8 +121,8 @@ func Test_FcCmdExecute(t *testing.T) {
 				"file_2":          &fstest.MapFile{},
 				"folder_1/file_1": &fstest.MapFile{},
 			},
+			expected: fmt.Sprintf(internals.FileCountFormat, 2),
 			args:     []string{},
-			expected: 2,
 		},
 		{
 			fsys: fstest.MapFS{
@@ -99,8 +130,8 @@ func Test_FcCmdExecute(t *testing.T) {
 				"file_2":          &fstest.MapFile{},
 				"folder_1/file_1": &fstest.MapFile{},
 			},
+			expected: fmt.Sprintf(internals.FileCountFormat, 3),
 			args:     []string{"-R"},
-			expected: 3,
 		},
 		{
 			fsys: fstest.MapFS{
@@ -108,8 +139,8 @@ func Test_FcCmdExecute(t *testing.T) {
 				"file_2":          &fstest.MapFile{},
 				"folder_1/file_1": &fstest.MapFile{},
 			},
+			expected: fmt.Sprintf(internals.FileCountFormat, 3),
 			args:     []string{"--recursive"},
-			expected: 3,
 		},
 		{
 			fsys: fstest.MapFS{
@@ -118,8 +149,8 @@ func Test_FcCmdExecute(t *testing.T) {
 				"folder_1/file_1": &fstest.MapFile{},
 				"folder_2/file_1": &fstest.MapFile{},
 			},
+			expected: fmt.Sprintf(internals.FileCountFormat, 4),
 			args:     []string{"--recursive"},
-			expected: 4,
 		},
 		{
 			fsys: fstest.MapFS{
@@ -131,8 +162,47 @@ func Test_FcCmdExecute(t *testing.T) {
 				"folder_2/file_1":              &fstest.MapFile{},
 				"folder_2/sub_folder_1":        &fstest.MapFile{Mode: fs.ModeDir},
 			},
+			expected: fmt.Sprintf(internals.FileCountFormat, 5),
 			args:     []string{"--recursive"},
-			expected: 5,
+		},
+		{
+			fsys: fstest.MapFS{
+				"file_1":                       &fstest.MapFile{},
+				"file_2":                       &fstest.MapFile{},
+				"folder_1/file_1":              &fstest.MapFile{},
+				"folder_1/sub_folder_1/file_1": &fstest.MapFile{},
+				"folder_1/sub_folder_2":        &fstest.MapFile{Mode: fs.ModeDir},
+				"folder_2/file_1":              &fstest.MapFile{},
+				"folder_2/sub_folder_1":        &fstest.MapFile{Mode: fs.ModeDir},
+			},
+			expected: fmt.Sprintf(internals.FileCountRawFormat, 5),
+			args:     []string{"--recursive", "--raw"},
+		},
+		{
+			fsys: fstest.MapFS{
+				"file_1":                       &fstest.MapFile{},
+				"file_2":                       &fstest.MapFile{},
+				"folder_1/file_1":              &fstest.MapFile{},
+				"folder_1/sub_folder_1/file_1": &fstest.MapFile{},
+				"folder_1/sub_folder_2":        &fstest.MapFile{Mode: fs.ModeDir},
+				"folder_2/file_1":              &fstest.MapFile{},
+				"folder_2/sub_folder_1":        &fstest.MapFile{Mode: fs.ModeDir},
+			},
+			expected: fmt.Sprintf(internals.FileCountRawFormat, 5),
+			args:     []string{"-rR"},
+		},
+		{
+			fsys: fstest.MapFS{
+				"file_1":                       &fstest.MapFile{},
+				"file_2":                       &fstest.MapFile{},
+				"folder_1/file_1":              &fstest.MapFile{},
+				"folder_1/sub_folder_1/file_1": &fstest.MapFile{},
+				"folder_1/sub_folder_2":        &fstest.MapFile{Mode: fs.ModeDir},
+				"folder_2/file_1":              &fstest.MapFile{},
+				"folder_2/sub_folder_1":        &fstest.MapFile{Mode: fs.ModeDir},
+			},
+			expected: fmt.Sprintf(internals.FileCountRawFormat, 2),
+			args:     []string{"-r"},
 		},
 	}
 
@@ -149,10 +219,10 @@ func Test_FcCmdExecute(t *testing.T) {
 
 				out, err := io.ReadAll(b)
 				if assert.NoError(t, err) {
-					assert.Contains(
+					assert.Equal(
 						t,
+						tc.expected,
 						string(out),
-						fmt.Sprintf("%d files", tc.expected),
 					)
 				}
 			},
