@@ -11,9 +11,9 @@ import (
 func NewSizeCmd(fsys fs.FS) *cobra.Command {
 	sizeCmd := &cobra.Command{
 		Use:        "size",
-		Aliases:    []string{},
+		Aliases:    []string{"ds", "dirsize", "DirSize", "Dirsize", "dirSize"},
 		Example:    `dinf size`,
-		SuggestFor: []string{"szie", "siez"},
+		SuggestFor: []string{"szie", "siez", "sd"},
 		Short:      "Compute the size (in bytes) of the files in the current directory.",
 		// Long:       "",
 		Args: cobra.NoArgs,
