@@ -7,11 +7,15 @@ It is a (very) small CLI application that:
   - (opt.) Count the files recursively.
   - (opt.) Output only the file count instead of a human friendly sentence.
 - Size of the current working directory
-  - (opt.) Size the files recursively (to be develop).
+  - (opt.) Size the files recursively.
+  - (opt.) Output only the file count instead of a human friendly sentence
+  (to be developed).
 
 ... many more features to come
 
-# Goals
+## Goals
 
-The goals of this (very) small project is to practice Golang development: it's pattern, it's standard library.
-While also practicing on developing tests at various levels. Here both the internals and the top-level CLI is tested.
+The goals of this (very) small project is to practice Golang development:
+it's pattern, it's standard library.
+While also practicing on developing tests at various levels.
+Here both the internals and the top-level CLI is tested.
