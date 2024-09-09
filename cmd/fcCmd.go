@@ -44,7 +44,7 @@ func NewFcCmd(fsys fs.FS) *cobra.Command {
 		"recursive",
 		"R",
 		false,
-		"By default, fileCount (fc) command look only at the direct child of the current working directory. If the recursive flag is specified, fileCount will travers all the file tree.",
+		"By default, fileCount (fc) command look only at the direct child of the current working directory. If the recursive flag is specified, fileCount will traverse all the file tree.",
 	)
 
 	fcCmd.Flags().BoolP(
