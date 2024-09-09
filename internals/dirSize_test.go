@@ -11,12 +11,12 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestDinf(t *testing.T) {
+func Test_DirSize(t *testing.T) {
 	t.Run("No file in file system", func(t *testing.T) {
 		fsys := fstest.MapFS{}
 
 		buf := bytes.Buffer{}
-		internals.DirSizeCmd(&buf, fsys, internals.DirSizeOpts{Recursive: false})
+		internals.DirSize(&buf, fsys, internals.DirSizeOpts{Recursive: false})
 		got := buf.String()
 		want := fmt.Sprintf(internals.SizeFormat, 0)
 		if got != want {
@@ -24,7 +24,7 @@ func TestDinf(t *testing.T) {
 		}
 
 		bufR := bytes.Buffer{}
-		internals.DirSizeCmd(&bufR, fsys, internals.DirSizeOpts{Recursive: true})
+		internals.DirSize(&bufR, fsys, internals.DirSizeOpts{Recursive: true})
 		gotR := bufR.String()
 		wantR := fmt.Sprintf(internals.SizeFormat, 0)
 		if gotR != wantR {
@@ -38,7 +38,7 @@ func TestDinf(t *testing.T) {
 		}
 
 		buf := bytes.Buffer{}
-		internals.DirSizeCmd(&buf, fsys, internals.DirSizeOpts{Recursive: false})
+		internals.DirSize(&buf, fsys, internals.DirSizeOpts{Recursive: false})
 		got := buf.String()
 		want := fmt.Sprintf(internals.SizeFormat, 3)
 		if got != want {
@@ -46,7 +46,7 @@ func TestDinf(t *testing.T) {
 		}
 
 		bufR := bytes.Buffer{}
-		internals.DirSizeCmd(&bufR, fsys, internals.DirSizeOpts{Recursive: true})
+		internals.DirSize(&bufR, fsys, internals.DirSizeOpts{Recursive: true})
 		gotR := bufR.String()
 		wantR := fmt.Sprintf(internals.SizeFormat, 3)
 		if gotR != wantR {
@@ -61,7 +61,7 @@ func TestDinf(t *testing.T) {
 		}
 
 		buf := bytes.Buffer{}
-		internals.DirSizeCmd(&buf, fsys, internals.DirSizeOpts{Recursive: false})
+		internals.DirSize(&buf, fsys, internals.DirSizeOpts{Recursive: false})
 		got := buf.String()
 		want := fmt.Sprintf(internals.SizeFormat, 4)
 		if got != want {
@@ -69,7 +69,7 @@ func TestDinf(t *testing.T) {
 		}
 
 		bufR := bytes.Buffer{}
-		internals.DirSizeCmd(&bufR, fsys, internals.DirSizeOpts{Recursive: true})
+		internals.DirSize(&bufR, fsys, internals.DirSizeOpts{Recursive: true})
 		gotR := bufR.String()
 		wantR := fmt.Sprintf(internals.SizeFormat, 4)
 		if gotR != wantR {
@@ -102,14 +102,14 @@ func TestDinf(t *testing.T) {
 
 		for i, tc := range testcases {
 			buf := bytes.Buffer{}
-			internals.DirSizeCmd(&buf, fsys, tc.opts)
+			internals.DirSize(&buf, fsys, tc.opts)
 			actual := buf.String()
 
 			assert.Equal(
 				t,
 				tc.expected,
 				actual,
-				fmt.Sprintf("internals.DirSizeCmd exec case %d", i),
+				fmt.Sprintf("internals.DirSize exec case %d", i),
 			)
 		}
 	})

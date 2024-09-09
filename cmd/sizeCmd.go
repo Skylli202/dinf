@@ -25,7 +25,7 @@ func NewSizeCmd(fsys fs.FS) *cobra.Command {
 				return err
 			}
 
-			internals.DirSizeCmd(w, fsys, internals.DirSizeOpts{Recursive: recursive})
+			internals.DirSize(w, fsys, internals.DirSizeOpts{Recursive: recursive})
 
 			return nil
 		},
