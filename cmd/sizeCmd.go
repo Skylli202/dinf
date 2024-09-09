@@ -32,6 +32,6 @@ func NewSizeCmd(fsys fs.FS) *cobra.Command {
 func init() {
 	wd, _ := os.Getwd()
 	fsys := os.DirFS(wd)
-	fcCmd := NewSizeCmd(fsys)
-	rootCmd.AddCommand(fcCmd)
+	sizeCmd := NewSizeCmd(fsys)
+	rootCmd.AddCommand(sizeCmd)
 }
