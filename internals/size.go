@@ -2,17 +2,16 @@ package internals
 
 import (
 	"dinf/internals/dirs"
+	"fmt"
 	"io"
 	"io/fs"
-	"text/template"
 )
 
-const DinfTemplate = "Folder size is: {{.Size}} bytes.\n"
+const SizeFormat = "Folder size is: %d bytes.\n"
 
 func DirSizeCmd(w io.Writer, fsys fs.FS) {
 	// FIX: This error needs to be handled properly, with testing.
 	size, _ := dirs.DirSize(fsys)
 	// FIX: This error needs to be handled properly, with testing.
-	t, _ := template.New("DinfTemplate").Parse(DinfTemplate)
-	t.Execute(w, struct{ Size int64 }{Size: size})
+	fmt.Fprintf(w, SizeFormat, size)
 }

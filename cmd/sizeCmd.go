@@ -2,26 +2,36 @@ package cmd
 
 import (
 	"dinf/internals"
+	"io/fs"
 	"os"
 
 	"github.com/spf13/cobra"
 )
 
-var sizeCmd = &cobra.Command{
-	Use:        "size",
-	Aliases:    []string{},
-	Example:    `dinf size`,
-	SuggestFor: []string{"szie", "siez"},
-	Short:      "Compute the size (in bytes) of the files in the current directory.",
-	// Long:       "",
-	Args: cobra.NoArgs,
-	Run: func(cmd *cobra.Command, args []string) {
-		wd, _ := os.Getwd()
-		fsys := os.DirFS(wd)
-		internals.DirSizeCmd(os.Stdout, fsys)
-	},
+func NewSizeCmd(fsys fs.FS) *cobra.Command {
+	sizeCmd := &cobra.Command{
+		Use:        "size",
+		Aliases:    []string{},
+		Example:    `dinf size`,
+		SuggestFor: []string{"szie", "siez"},
+		Short:      "Compute the size (in bytes) of the files in the current directory.",
+		// Long:       "",
+		Args: cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			w := cmd.OutOrStdout()
+
+			internals.DirSizeCmd(w, fsys)
+
+			return nil
+		},
+	}
+
+	return sizeCmd
 }
 
 func init() {
-	rootCmd.AddCommand(sizeCmd)
+	wd, _ := os.Getwd()
+	fsys := os.DirFS(wd)
+	fcCmd := NewSizeCmd(fsys)
+	rootCmd.AddCommand(fcCmd)
 }

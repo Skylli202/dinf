@@ -2,9 +2,9 @@ package cmd_test
 
 import (
 	"bytes"
-	"fmt"
 	"dinf/cmd"
 	"dinf/internals"
+	"fmt"
 	"io"
 	"io/fs"
 	"testing"
@@ -191,6 +191,7 @@ func Test_FcCmdExecute(t *testing.T) {
 			expected: fmt.Sprintf(internals.FileCountRawFormat, 5),
 			args:     []string{"-rR"},
 		},
+		// FS w/ root files, 2 folders, 3 subfolders and subfiles.
 		{
 			fsys: fstest.MapFS{
 				"file_1":                       &fstest.MapFile{},
