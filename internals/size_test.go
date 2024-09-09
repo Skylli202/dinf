@@ -2,11 +2,13 @@ package internals_test
 
 import (
 	"bytes"
-	"fmt"
 	"dinf/internals"
+	"fmt"
 	"io/fs"
 	"testing"
 	"testing/fstest"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestDinf(t *testing.T) {
@@ -14,13 +16,19 @@ func TestDinf(t *testing.T) {
 		fsys := fstest.MapFS{}
 
 		buf := bytes.Buffer{}
-		internals.DirSizeCmd(&buf, fsys)
-
+		internals.DirSizeCmd(&buf, fsys, internals.DirSizeOpts{Recursive: false})
 		got := buf.String()
-		want := fmt.Sprintf("Folder size is: %d bytes.\n", 0)
-
+		want := fmt.Sprintf(internals.SizeFormat, 0)
 		if got != want {
 			t.Errorf("got: %q, want: %q", got, want)
+		}
+
+		bufR := bytes.Buffer{}
+		internals.DirSizeCmd(&bufR, fsys, internals.DirSizeOpts{Recursive: true})
+		gotR := bufR.String()
+		wantR := fmt.Sprintf(internals.SizeFormat, 0)
+		if gotR != wantR {
+			t.Errorf("got: %q, want: %q", gotR, wantR)
 		}
 	})
 
@@ -30,50 +38,79 @@ func TestDinf(t *testing.T) {
 		}
 
 		buf := bytes.Buffer{}
-		internals.DirSizeCmd(&buf, fsys)
-
+		internals.DirSizeCmd(&buf, fsys, internals.DirSizeOpts{Recursive: false})
 		got := buf.String()
-		want := fmt.Sprintf("Folder size is: %d bytes.\n", 3)
-
+		want := fmt.Sprintf(internals.SizeFormat, 3)
 		if got != want {
 			t.Errorf("got: %q, want: %q", got, want)
+		}
+
+		bufR := bytes.Buffer{}
+		internals.DirSizeCmd(&bufR, fsys, internals.DirSizeOpts{Recursive: true})
+		gotR := bufR.String()
+		wantR := fmt.Sprintf(internals.SizeFormat, 3)
+		if gotR != wantR {
+			t.Errorf("got: %q, want: %q", gotR, wantR)
 		}
 	})
 
 	t.Run("Directory in file system", func(t *testing.T) {
 		fsys := fstest.MapFS{
-			"foo":  &fstest.MapFile{Data: []byte("1234")},
-			"dir/": &fstest.MapFile{Mode: fs.ModeDir},
+			"foo": &fstest.MapFile{Data: []byte("1234")},
+			"dir": &fstest.MapFile{Mode: fs.ModeDir},
 		}
 
 		buf := bytes.Buffer{}
-		internals.DirSizeCmd(&buf, fsys)
-
+		internals.DirSizeCmd(&buf, fsys, internals.DirSizeOpts{Recursive: false})
 		got := buf.String()
-		want := fmt.Sprintf("Folder size is: %d bytes.\n", 4)
-
+		want := fmt.Sprintf(internals.SizeFormat, 4)
 		if got != want {
 			t.Errorf("got: %q, want: %q", got, want)
+		}
+
+		bufR := bytes.Buffer{}
+		internals.DirSizeCmd(&bufR, fsys, internals.DirSizeOpts{Recursive: true})
+		gotR := bufR.String()
+		wantR := fmt.Sprintf(internals.SizeFormat, 4)
+		if gotR != wantR {
+			t.Errorf("got: %q, want: %q", gotR, wantR)
 		}
 	})
 
 	t.Run("Directory with files in file system", func(t *testing.T) {
 		fsys := fstest.MapFS{
 			"foo":   &fstest.MapFile{Data: []byte("1234")},
-			"dir/":  &fstest.MapFile{Mode: fs.ModeDir},
+			"dir":   &fstest.MapFile{Mode: fs.ModeDir},
 			"dir/a": &fstest.MapFile{Data: []byte("1234")},
 			"dir/b": &fstest.MapFile{Data: []byte("1234")},
 			"dir/c": &fstest.MapFile{Data: []byte("1234")},
 		}
 
-		buf := bytes.Buffer{}
-		internals.DirSizeCmd(&buf, fsys)
+		testcases := []struct {
+			expected string
+			opts     internals.DirSizeOpts
+		}{
+			{
+				expected: fmt.Sprintf(internals.SizeFormat, 4),
+				opts:     internals.DirSizeOpts{Recursive: false},
+			},
+			{
+				expected: fmt.Sprintf(internals.SizeFormat, 16),
+				opts:     internals.DirSizeOpts{Recursive: true},
+			},
+		}
 
-		got := buf.String()
-		want := fmt.Sprintf("Folder size is: %d bytes.\n", 4)
+		for i, tc := range testcases {
+			buf := bytes.Buffer{}
+			internals.DirSizeCmd(&buf, fsys, tc.opts)
+			actual := buf.String()
 
-		if got != want {
-			t.Errorf("got: %q, want: %q", got, want)
+			assert.Equal(
+				t,
+				tc.expected,
+				actual,
+				fmt.Sprintf("internals.DirSizeCmd exec case %d", i),
+			)
 		}
 	})
 }

@@ -14,7 +14,34 @@ import (
 )
 
 func Test_NewSizeCmd(t *testing.T) {
-	t.Run("", func(t *testing.T) {})
+	t.Run(
+		"SizeCmd should have a recursive flag of type Bool, and its default value should be false",
+		func(t *testing.T) {
+			sizeCmd := cmd.NewSizeCmd(emptyFS)
+			b, err := sizeCmd.Flags().GetBool("recursive")
+			sizeCmd.Execute()
+			if assert.NoError(t, err, "FcCmd should have a recursive flag") {
+				assert.False(t, b, "recursive flag should be flase by default")
+			}
+		})
+	t.Run("--recursive should pass the flag recursive to true", func(t *testing.T) {
+		sizeCmd := cmd.NewSizeCmd(emptyFS)
+		sizeCmd.SetArgs([]string{"--recursive"})
+		sizeCmd.Execute()
+		b, err := sizeCmd.Flags().GetBool("recursive")
+		if assert.NoError(t, err, "SizeCmd should have a recursive flag") {
+			assert.True(t, b, "recursive flag should be true if '--recursive' is specified in the args")
+		}
+	})
+	t.Run("-R should pass the flag recursive to true", func(t *testing.T) {
+		sizeCmd := cmd.NewSizeCmd(emptyFS)
+		sizeCmd.SetArgs([]string{"-R"})
+		sizeCmd.Execute()
+		b, err := sizeCmd.Flags().GetBool("recursive")
+		if assert.NoError(t, err, "SizeCmd should have a recursive flag") {
+			assert.True(t, b, "recursive flag should be true if '-R' is specified in the args")
+		}
+	})
 }
 
 func Test_SizeCmdExecute(t *testing.T) {
@@ -23,11 +50,13 @@ func Test_SizeCmdExecute(t *testing.T) {
 		expected string
 		args     []string
 	}{
+		// 0
 		{
 			fsys:     fstest.MapFS{},
 			expected: fmt.Sprintf(internals.SizeFormat, 0),
 			args:     []string{},
 		},
+		// 1
 		{
 			fsys: fstest.MapFS{
 				"file_1": &fstest.MapFile{},
@@ -36,6 +65,7 @@ func Test_SizeCmdExecute(t *testing.T) {
 			expected: fmt.Sprintf(internals.SizeFormat, 0),
 			args:     []string{},
 		},
+		// 2
 		{
 			fsys: fstest.MapFS{
 				"file_1": &fstest.MapFile{Data: []byte("123")},
@@ -44,6 +74,7 @@ func Test_SizeCmdExecute(t *testing.T) {
 			expected: fmt.Sprintf(internals.SizeFormat, 6),
 			args:     []string{},
 		},
+		// 3
 		{
 			fsys: fstest.MapFS{
 				"file_1":                       &fstest.MapFile{Data: []byte("1")},
@@ -56,6 +87,20 @@ func Test_SizeCmdExecute(t *testing.T) {
 			},
 			expected: fmt.Sprintf(internals.SizeFormat, 2),
 			args:     []string{},
+		},
+		// 4
+		{
+			fsys: fstest.MapFS{
+				"file_1":                       &fstest.MapFile{Data: []byte("1")},
+				"file_2":                       &fstest.MapFile{Data: []byte("1")},
+				"folder_1/file_1":              &fstest.MapFile{Data: []byte("1")},
+				"folder_1/sub_folder_1/file_1": &fstest.MapFile{Data: []byte("1")},
+				"folder_1/sub_folder_2":        &fstest.MapFile{Mode: fs.ModeDir},
+				"folder_2/file_1":              &fstest.MapFile{Data: []byte("1")},
+				"folder_2/sub_folder_1":        &fstest.MapFile{Mode: fs.ModeDir},
+			},
+			expected: fmt.Sprintf(internals.SizeFormat, 5),
+			args:     []string{"--recursive"},
 		},
 	}
 

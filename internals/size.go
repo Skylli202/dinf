@@ -9,9 +9,18 @@ import (
 
 const SizeFormat = "Folder size is: %d bytes.\n"
 
-func DirSizeCmd(w io.Writer, fsys fs.FS) {
+type DirSizeOpts struct {
+	Recursive bool
+}
+
+func DirSizeCmd(w io.Writer, fsys fs.FS, opts DirSizeOpts) {
 	// FIX: This error needs to be handled properly, with testing.
-	size, _ := dirs.DirSize(fsys)
+	var size int64
+	if opts.Recursive {
+		size, _ = dirs.DirSizeR(fsys)
+	} else {
+		size, _ = dirs.DirSize(fsys)
+	}
 	// FIX: This error needs to be handled properly, with testing.
 	fmt.Fprintf(w, SizeFormat, size)
 }

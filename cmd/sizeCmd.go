@@ -20,11 +20,23 @@ func NewSizeCmd(fsys fs.FS) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			w := cmd.OutOrStdout()
 
-			internals.DirSizeCmd(w, fsys)
+			recursive, err := cmd.Flags().GetBool("recursive")
+			if err != nil {
+				return err
+			}
+
+			internals.DirSizeCmd(w, fsys, internals.DirSizeOpts{Recursive: recursive})
 
 			return nil
 		},
 	}
+
+	sizeCmd.Flags().BoolP(
+		"recursive",
+		"R",
+		false,
+		"By default, size command look only at the direct child of the current working directory. If the recursive flag is specified, size will traverse all the file tree.",
+	)
 
 	return sizeCmd
 }
