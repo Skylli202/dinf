@@ -1,5 +1,7 @@
 # Directory INFormation
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/Skylli202/go-dinf.svg)](https://pkg.go.dev/github.com/Skylli202/go-dinf)
+
 `dinf` stands for directory information.
 It is a (very) small CLI application that:
 
