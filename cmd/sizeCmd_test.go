@@ -9,8 +9,8 @@ import (
 	"testing"
 	"testing/fstest"
 
-	"github.com/Skylli202/go-dinf/cmd"
-	"github.com/Skylli202/go-dinf/internals"
+	"github.com/Skylli202/dinf/cmd"
+	"github.com/Skylli202/dinf/internals"
 	"github.com/stretchr/testify/assert"
 )
 

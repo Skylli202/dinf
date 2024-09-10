@@ -4,7 +4,7 @@ import (
 	"io/fs"
 	"os"
 
-	"github.com/Skylli202/go-dinf/internals"
+	"github.com/Skylli202/dinf/internals"
 	"github.com/spf13/cobra"
 )
 
