@@ -85,7 +85,6 @@ func Test_DirSize(t *testing.T) {
 			"dir/b": &fstest.MapFile{Data: []byte("1234")},
 			"dir/c": &fstest.MapFile{Data: []byte("1234")},
 		}
-
 		testcases := []struct {
 			expected string
 			opts     internals.DirSizeOpts
@@ -95,8 +94,16 @@ func Test_DirSize(t *testing.T) {
 				opts:     internals.DirSizeOpts{Recursive: false},
 			},
 			{
+				expected: fmt.Sprintf(internals.SizeRawFormat, 4),
+				opts:     internals.DirSizeOpts{Recursive: false, Raw: true},
+			},
+			{
 				expected: fmt.Sprintf(internals.SizeFormat, 16),
 				opts:     internals.DirSizeOpts{Recursive: true},
+			},
+			{
+				expected: fmt.Sprintf(internals.SizeRawFormat, 16),
+				opts:     internals.DirSizeOpts{Recursive: true, Raw: true},
 			},
 		}
 

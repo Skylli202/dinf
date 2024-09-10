@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"strings"
 	"testing"
 	"testing/fstest"
 
@@ -42,14 +43,45 @@ func Test_NewSizeCmd(t *testing.T) {
 			assert.True(t, b, "recursive flag should be true if '-R' is specified in the args")
 		}
 	})
+
+	t.Run(
+		"SizeCmd should have a raw flag of type Bool, and its default value should be false",
+		func(t *testing.T) {
+			sizeCmd := cmd.NewSizeCmd(emptyFS)
+			b, err := sizeCmd.Flags().GetBool("raw")
+			sizeCmd.Execute()
+			if assert.NoError(t, err, "FcCmd should have a raw flag") {
+				assert.False(t, b, "raw flag should be flase by default")
+			}
+		})
+	t.Run("--raw should pass the flag raw to true", func(t *testing.T) {
+		sizeCmd := cmd.NewSizeCmd(emptyFS)
+		sizeCmd.SetArgs([]string{"--raw"})
+		sizeCmd.Execute()
+		b, err := sizeCmd.Flags().GetBool("raw")
+		if assert.NoError(t, err, "SizeCmd should have a raw flag") {
+			assert.True(t, b, "raw flag should be true if '--raw' is specified in the args")
+		}
+	})
+	t.Run("-R should pass the flag raw to true", func(t *testing.T) {
+		sizeCmd := cmd.NewSizeCmd(emptyFS)
+		sizeCmd.SetArgs([]string{"-r"})
+		sizeCmd.Execute()
+		b, err := sizeCmd.Flags().GetBool("raw")
+		if assert.NoError(t, err, "SizeCmd should have a raw flag") {
+			assert.True(t, b, "raw flag should be true if '-R' is specified in the args")
+		}
+	})
+}
+
+type testcase struct {
+	fsys     fs.FS
+	expected string
+	args     []string
 }
 
 func Test_SizeCmdExecute(t *testing.T) {
-	testcases := []struct {
-		fsys     fstest.MapFS
-		expected string
-		args     []string
-	}{
+	testcases := []testcase{
 		// 0
 		{
 			fsys:     fstest.MapFS{},
@@ -102,6 +134,20 @@ func Test_SizeCmdExecute(t *testing.T) {
 			expected: fmt.Sprintf(internals.SizeFormat, 5),
 			args:     []string{"--recursive"},
 		},
+		// 5
+		{
+			fsys: fstest.MapFS{
+				"file_1":                       &fstest.MapFile{Data: []byte("1")},
+				"file_2":                       &fstest.MapFile{Data: []byte("1")},
+				"folder_1/file_1":              &fstest.MapFile{Data: []byte("1")},
+				"folder_1/sub_folder_1/file_1": &fstest.MapFile{Data: []byte("1")},
+				"folder_1/sub_folder_2":        &fstest.MapFile{Mode: fs.ModeDir},
+				"folder_2/file_1":              &fstest.MapFile{Data: []byte("1")},
+				"folder_2/sub_folder_1":        &fstest.MapFile{Mode: fs.ModeDir},
+			},
+			expected: fmt.Sprintf(internals.SizeRawFormat, 2),
+			args:     []string{"--raw"},
+		},
 	}
 
 	for i, tc := range testcases {
@@ -121,9 +167,28 @@ func Test_SizeCmdExecute(t *testing.T) {
 						t,
 						tc.expected,
 						string(out),
+						tc,
 					)
 				}
 			},
 		)
 	}
+}
+
+func (tc testcase) String() string {
+	s := fmt.Sprintf("Cmd args are: [%s]\n", strings.Join(tc.args, ", "))
+	s = s + mapToString(tc.fsys)
+	return s
+}
+
+func mapToString(fsys fs.FS) (s string) {
+	fs.WalkDir(fsys, ".", func(path string, d fs.DirEntry, err error) error {
+		i, e := d.Info()
+		if e != nil {
+			s = s + fmt.Sprintf("%s\n", d)
+		}
+		s = s + fmt.Sprintf("%s %v %s\n", i.Mode(), i.Size(), path)
+		return nil
+	})
+	return
 }

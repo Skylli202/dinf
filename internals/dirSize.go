@@ -7,10 +7,14 @@ import (
 	"io/fs"
 )
 
-const SizeFormat = "Folder size is: %d bytes.\n"
+const (
+	SizeFormat    = "Folder size is: %d bytes.\n"
+	SizeRawFormat = "%d\n"
+)
 
 type DirSizeOpts struct {
 	Recursive bool
+	Raw       bool
 }
 
 func DirSize(w io.Writer, fsys fs.FS, opts DirSizeOpts) {
@@ -22,5 +26,11 @@ func DirSize(w io.Writer, fsys fs.FS, opts DirSizeOpts) {
 		// FIX: This error needs to be handled properly, with testing.
 		size, _ = dirs.DirSize(fsys)
 	}
-	fmt.Fprintf(w, SizeFormat, size)
+
+	format := SizeFormat
+	if opts.Raw {
+		format = SizeRawFormat
+	}
+
+	fmt.Fprintf(w, format, size)
 }
