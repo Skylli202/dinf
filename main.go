@@ -1,6 +1,6 @@
 package main
 
-import "github.com/Skylli/go-dinf/cmd"
+import "github.com/Skylli202/go-dinf/cmd"
 
 func main() {
 	cmd.Execute()

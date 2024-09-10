@@ -5,7 +5,7 @@ import (
 	"io"
 	"io/fs"
 
-	"github.com/Skylli/go-dinf/internals/dirs"
+	"github.com/Skylli202/go-dinf/internals/dirs"
 )
 
 const (
