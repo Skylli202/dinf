@@ -1,10 +1,10 @@
 package cmd
 
 import (
-	"dinf/internals"
 	"io/fs"
 	"os"
 
+	"github.com/Skylli/go-dinf/internals"
 	"github.com/spf13/cobra"
 )
 

@@ -2,8 +2,6 @@ package cmd_test
 
 import (
 	"bytes"
-	"dinf/cmd"
-	"dinf/internals"
 	"fmt"
 	"io"
 	"io/fs"
@@ -11,6 +9,8 @@ import (
 	"testing"
 	"testing/fstest"
 
+	"github.com/Skylli/go-dinf/cmd"
+	"github.com/Skylli/go-dinf/internals"
 	"github.com/stretchr/testify/assert"
 )
 

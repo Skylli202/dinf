@@ -2,11 +2,11 @@ package dirs_test
 
 import (
 	"fmt"
-	"dinf/internals/dirs"
 	"io/fs"
 	"testing"
 	"testing/fstest"
 
+	"github.com/Skylli/go-dinf/internals/dirs"
 	"github.com/stretchr/testify/assert"
 )
 

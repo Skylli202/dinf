@@ -2,12 +2,12 @@ package internals_test
 
 import (
 	"bytes"
-	"dinf/internals"
 	"fmt"
 	"io/fs"
 	"testing"
 	"testing/fstest"
 
+	"github.com/Skylli/go-dinf/internals"
 	"github.com/stretchr/testify/assert"
 )
 

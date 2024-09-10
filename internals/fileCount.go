@@ -2,9 +2,10 @@ package internals
 
 import (
 	"fmt"
-	"dinf/internals/dirs"
 	"io"
 	"io/fs"
+
+	"github.com/Skylli/go-dinf/internals/dirs"
 )
 
 const (
