@@ -7,7 +7,8 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use: "dinf",
+	Use:     "dinf",
+	Version: "v0.0.1",
 }
 
 func Execute() {
