@@ -1,4 +1,4 @@
-module dinf
+module github.com/Skylli/go-dinf
 
 go 1.22.0
 
