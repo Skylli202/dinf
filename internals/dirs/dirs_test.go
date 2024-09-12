@@ -10,7 +10,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestDirSize(t *testing.T) {
+// Test DirSize and DirSizeR
+func Test_DirSize(t *testing.T) {
 	cases := []struct {
 		fs            fstest.MapFS
 		msg           string
@@ -84,6 +85,63 @@ func TestDirSize(t *testing.T) {
 	}
 }
 
+func Test_DirSizeR_MaxDepth(t *testing.T) {
+	fsys_1 := fstest.MapFS{
+		// depth 0
+		"file_1": &fstest.MapFile{Data: []byte{1}},
+		"file_2": &fstest.MapFile{Data: []byte{1}},
+
+		// depth 1
+		"folder_1/file_1": &fstest.MapFile{Data: []byte{1}},
+		"folder_1/file_2": &fstest.MapFile{Data: []byte{1}},
+		"folder_2/file_1": &fstest.MapFile{Data: []byte{1}},
+		"folder_2/file_2": &fstest.MapFile{Data: []byte{1}},
+		"folder_3/file_1": &fstest.MapFile{Data: []byte{1}},
+
+		// depth 2
+		"folder_3/folder_3_1/file_1": &fstest.MapFile{Data: []byte{1}},
+		"folder_3/folder_3_1/file_2": &fstest.MapFile{Data: []byte{1}},
+
+		// depth 3
+		"folder_3/folder_3_2/folder_3_2_1/file_1": &fstest.MapFile{Data: []byte{1}},
+	}
+
+	testcases := []struct {
+		fsys     fs.FS
+		maxdepth int
+		expected int64
+	}{
+		{
+			fsys:     fsys_1,
+			maxdepth: 0,
+			expected: 2,
+		},
+		{
+			fsys:     fsys_1,
+			maxdepth: 1,
+			expected: 2 + 5,
+		},
+		{
+			fsys:     fsys_1,
+			maxdepth: 2,
+			expected: 2 + 5 + 2,
+		},
+		{
+			fsys:     fsys_1,
+			maxdepth: 3,
+			expected: 2 + 5 + 2 + 1,
+		},
+	}
+
+	for _, tc := range testcases {
+		got, err := dirs.DirSizeRMD(tc.fsys, tc.maxdepth)
+
+		if assert.NoError(t, err) {
+			assert.Equal(t, tc.expected, got)
+		}
+	}
+}
+
 type (
 	mMapFS struct {
 		fstest.MapFS
@@ -109,7 +167,7 @@ func (fsys mMapFS) ReadDir(name string) ([]fs.DirEntry, error) {
 
 var ErrMockFSReadDir = fmt.Errorf("MockFS.ReadDir(): forced error")
 
-func TestDirSizeErrorOnReadDir(t *testing.T) {
+func Test_DirSize_ErrorOnReadDir(t *testing.T) {
 	cases := []struct {
 		expectedError error
 		fs            fs.FS

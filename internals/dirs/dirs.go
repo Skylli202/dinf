@@ -2,7 +2,11 @@ package dirs
 
 import (
 	"errors"
+	"fmt"
 	"io/fs"
+	"os"
+	"path/filepath"
+	"strings"
 )
 
 // Given a filesystem (interface fs.FS) is read the directory
@@ -39,6 +43,41 @@ func DirSize(fsys fs.FS) (int64, error) {
 	return dirSize, nil
 }
 
+func DirSizeRMD(fsys fs.FS, maxdepth int) (int64, error) {
+	fmt.Printf("maxdepth: %d\n", maxdepth)
+	dirSize := int64(0)
+
+	// FIX: Implement test cases for [fs.WalkDir] returning an error
+	fs.WalkDir(fsys, ".", func(path string, d fs.DirEntry, err error) error {
+		// FIX: Implement test cases for err not nil in the WalkDirFunc
+
+		var currentDepth int
+		dirname := filepath.Dir(path)
+		if dirname == "." {
+			currentDepth = 0
+		} else {
+			currentDepth = strings.Count(dirname, string(os.PathSeparator)) + 1
+		}
+		fmt.Printf("path: %q - currentDepth: %d\n", path, currentDepth)
+
+		if currentDepth > maxdepth {
+			return fs.SkipDir
+		}
+
+		if !d.IsDir() {
+			// FIX: Implement test cases for err not nil upon [fs.FileInfo.Info()]
+			info, _ := d.Info()
+			dirSize += info.Size()
+		}
+
+		return nil
+	})
+
+	return dirSize, nil
+}
+
+// DirSizeR compute the size of the root directory by summing it files' size.
+// Then proceed to do it for all of the subdirectories.
 func DirSizeR(fsys fs.FS) (int64, error) {
 	dirSize := int64(0)
 	// FIX: Implement test cases for [fs.WalkDir] returning an error
