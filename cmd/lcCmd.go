@@ -4,6 +4,7 @@ import (
 	"io/fs"
 	"os"
 
+	"github.com/Skylli202/dinf/internals"
 	"github.com/spf13/cobra"
 )
 
@@ -16,6 +17,9 @@ func NewLcCmd(fsys fs.FS) *cobra.Command {
 		Short:      "Count lines in files of the current directory.",
 		Args:       cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			w := cmd.OutOrStdout()
+			opts := internals.LineCountOpts{}
+			internals.LineCount(w, fsys, opts)
 			return nil
 		},
 	}
