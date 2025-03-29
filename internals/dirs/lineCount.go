@@ -35,9 +35,11 @@ func LineCount(dirname string) (int, error) {
 
 		r := bufio.NewReader(f)
 		for {
-			_, err := r.ReadBytes('\n')
+			b, err := r.ReadBytes('\n')
 			if err != nil && errors.Is(err, io.EOF) {
-				lc += 1
+				if len(b) > 0 {
+					lc += 1
+				}
 				break
 			} else if err != nil {
 				return 0, err

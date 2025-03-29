@@ -30,6 +30,25 @@ func TestLineCount(t *testing.T) {
 		// assert.Equal(t, tc.expectedSizeR, sizeR, fmt.Sprintf("Line count R  does not match.\nTest case: %d - %q.\nTest case's file system:\n%+v\n", i, tc.msg, tc.fs))
 	})
 
+	t.Run("Flat file system - 1 empty file", func(t *testing.T) {
+		dirname, err := os.MkdirTemp("", "")
+		if err != nil {
+			t.Fatalf("Unable to `os.MkdirTemp(...)`. Unable to execute tests. err: %v", err)
+		}
+		defer os.RemoveAll(dirname)
+
+		_, err = os.CreateTemp(dirname, "")
+		if err != nil {
+			t.Fatalf("Unable to `os.CreateTemp(\"%s\", \"\")`. Unable to execute tests. err: %v", dirname, err)
+		}
+
+		lc, err := dirs.LineCount(dirname)
+		expectedLineCount := 0
+
+		require.Nil(t, err, fmt.Sprintf("LineCount should not return nil. Returned error: %v, dirname: %s", err, dirname))
+		require.Equal(t, expectedLineCount, lc, fmt.Sprintf("LineCount does not match the expected line count. Dirname: %s", dirname))
+	})
+
 	t.Run("Flat file system - 1 file", func(t *testing.T) {
 		dirname, err := os.MkdirTemp("", "")
 		if err != nil {
