@@ -54,41 +54,4 @@ func TestLineCount(t *testing.T) {
 		require.Nil(t, err, fmt.Sprintf("LineCount should not return nil. Returned error: %v", err))
 		require.Equal(t, expectedLineCount, lc, "LineCount does not match the expected line count.")
 	})
-	// dname, err := os.MkdirTemp("", "testlinecount")
-	// if err != nil {
-	// 	t.Fatal("Unable to `os.MkdirTemp(...)`. Unable to execute tests.")
-	// }
-	// defer os.RemoveAll(dname)
-
-	// file1, err := os.CreateTemp("", "")
-	// cases := []struct {
-	// 	fs                 fstest.MapFS
-	// 	msg                string
-	// 	expectedLineCount  int
-	// 	expectedLineCountR int
-	// }{
-	// 	{
-	// 		fs:                 fstest.MapFS{},
-	// 		msg:                "Empty file system.",
-	// 		expectedLineCount:  0,
-	// 		expectedLineCountR: 0,
-	// 	},
-	// 	{
-	// 		fs: fstest.MapFS{
-	// 			"foo": &fstest.MapFile{Data: []byte("123")},
-	// 		},
-	// 		msg:                "A single line in a single file (no subdirectories).",
-	// 		expectedLineCount:  1,
-	// 		expectedLineCountR: 1,
-	// 	},
-	// }
-	// for i, tc := range cases {
-	// 	lc, err := dirs.LineCount(tc.fs)
-	// 	// lcR, errR := dirs.LineCountR(fsys fs.FS)
-	//
-	// 	assert.Nil(t, err, fmt.Sprintf("LineCount should return err equals to Nil, but it is not for test case: [%d] %s", i, tc.msg))
-	// 	// assert.Nil(t, errR, fmt.Sprintf("LineCountR should return err equals to Nil, but it is not for test case: [%d] %s", i, tc.msg))
-	// 	assert.Equal(t, tc.expectedLineCount, lc, fmt.Sprintf("Line count does not match.\nTest case: %d - %q.\nTest case's file system:\n%+v\n", i, tc.msg, tc.fs))
-	// 	// assert.Equal(t, tc.expectedSizeR, sizeR, fmt.Sprintf("Line count R  does not match.\nTest case: %d - %q.\nTest case's file system:\n%+v\n", i, tc.msg, tc.fs))
-	// }
 }
