@@ -6,27 +6,54 @@ import (
 	"testing"
 
 	"github.com/Skylli202/dinf/internals/dirs"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
+
+const SINGLE_LINE = "package sample"
 
 func TestLineCount(t *testing.T) {
 	t.Run("Empty dir", func(t *testing.T) {
-		emptyDirName, err := os.MkdirTemp("", "")
+		dirname, err := os.MkdirTemp("", "")
 		if err != nil {
 			t.Fatal("Unable to `os.MkdirTemp(...)`. Unable to execute tests.")
 		}
-		defer os.RemoveAll(emptyDirName)
+		defer os.RemoveAll(dirname)
 
 		msg := "Empty file system."
 		expectedLineCount := 0
 
-		fs := os.DirFS(emptyDirName)
-		lc, err := dirs.LineCount(fs)
+		lc, err := dirs.LineCount(dirname)
 
-		assert.Nil(t, err, fmt.Sprintf("LineCount should return err equals to Nil, but it is not for test case: [%d] %s", 999, msg))
+		require.Nil(t, err, fmt.Sprintf("LineCount should return err equals to Nil, but it is not for test case: [%d] %s", 999, msg))
 		// assert.Nil(t, errR, fmt.Sprintf("LineCountR should return err equals to Nil, but it is not for test case: [%d] %s", i, tc.msg))
-		assert.Equal(t, expectedLineCount, lc, fmt.Sprintf("Line count does not match.\nTest case: %d - %q.\nTest case's file system:\n%+v\n", 999, msg, emptyDirName))
+		require.Equal(t, expectedLineCount, lc, fmt.Sprintf("Line count does not match.\nTest case: %d - %q.\nTest case's file system:\n%+v\n", 999, msg, dirname))
 		// assert.Equal(t, tc.expectedSizeR, sizeR, fmt.Sprintf("Line count R  does not match.\nTest case: %d - %q.\nTest case's file system:\n%+v\n", i, tc.msg, tc.fs))
+	})
+
+	t.Run("Flat file system - 1 file", func(t *testing.T) {
+		dirname, err := os.MkdirTemp("", "")
+		if err != nil {
+			t.Fatalf("Unable to `os.MkdirTemp(...)`. Unable to execute tests. err: %v", err)
+		}
+		defer os.RemoveAll(dirname)
+
+		file, err := os.CreateTemp(dirname, "")
+		if err != nil {
+			t.Fatalf("Unable to `os.CreateTemp(\"%s\", \"\")`. Unable to execute tests. err: %v", dirname, err)
+		}
+		_, err = fmt.Fprint(file, SINGLE_LINE)
+		if err != nil {
+			t.Fatalf("Unable to write to the test file. Unable to execute tests. err: %v", err)
+		}
+
+		// msg := "Flat file system: one file, one line"
+		// expectedLineCount := 1
+
+		lc, err := dirs.LineCount(dirname)
+		_ = lc
+
+		require.Nil(t, err, fmt.Sprintf("LineCount should not return nil. Returned error: %v", err))
+		// require.Equal(t, expectedLineCount, lc, fmt.Sprintf("Line count does not match.\nTest case: %d - %q.\n", 999, msg))
 	})
 	// dname, err := os.MkdirTemp("", "testlinecount")
 	// if err != nil {
