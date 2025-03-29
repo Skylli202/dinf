@@ -6,6 +6,7 @@ import (
 
 	"github.com/Skylli202/dinf/cmd"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func Test_NewLcCmd(t *testing.T) {
@@ -15,36 +16,29 @@ func Test_NewLcCmd(t *testing.T) {
 	}
 	defer os.RemoveAll(dirname)
 
-	t.Run("LcCmd should have a raw flag of type Bool", func(t *testing.T) {
+	t.Run("LcCmd should have a raw flag of type Bool and default to false", func(t *testing.T) {
 		lcCmd := cmd.NewLcCmd(dirname)
-		_, err := lcCmd.Flags().GetBool("raw")
+		b, err := lcCmd.Flags().GetBool("raw")
 		lcCmd.Execute()
-		assert.NoError(t, err)
+		require.NoError(t, err, "LcCmd should have a `raw`, `-r` flag.")
+		require.False(t, b, "LcCmd's raw flag should be `false` by default.")
 	})
-	// t.Run("By default, raw flag should be false", func(t *testing.T) {
-	// 	fcCmd := cmd.NewFcCmd(emptyFS)
-	// 	b, err := fcCmd.Flags().GetBool("raw")
-	// 	fcCmd.Execute()
-	// 	if assert.NoError(t, err, "FcCmd should have a raw flag") {
-	// 		assert.False(t, b, "raw flag should be flase by default")
-	// 	}
-	// })
-	// t.Run("--raw should pass the flag raw to true", func(t *testing.T) {
-	// 	fcCmd := cmd.NewFcCmd(emptyFS)
-	// 	fcCmd.SetArgs([]string{"--raw"})
-	// 	fcCmd.Execute()
-	// 	b, err := fcCmd.Flags().GetBool("raw")
-	// 	if assert.NoError(t, err, "FcCmd should have a raw flag") {
-	// 		assert.True(t, b, "raw flag should be true if '--raw' is specified in the args")
-	// 	}
-	// })
-	// t.Run("-r should pass the flag raw to true", func(t *testing.T) {
-	// 	fcCmd := cmd.NewFcCmd(emptyFS)
-	// 	fcCmd.SetArgs([]string{"-r"})
-	// 	fcCmd.Execute()
-	// 	b, err := fcCmd.Flags().GetBool("raw")
-	// 	if assert.NoError(t, err, "FcCmd should have a raw flag") {
-	// 		assert.True(t, b, "raw flag should be true if '-r' is specified in the args")
-	// 	}
-	// })
+	t.Run("--raw should pass the flag raw to true", func(t *testing.T) {
+		lcCmd := cmd.NewLcCmd(dirname)
+		lcCmd.SetArgs([]string{"--raw"})
+		lcCmd.Execute()
+		b, err := lcCmd.Flags().GetBool("raw")
+		if assert.NoError(t, err, "LcCmd should have a raw flag") {
+			assert.True(t, b, "raw flag should be true if '--raw' is specified in the args")
+		}
+	})
+	t.Run("-r should pass the flag raw to true", func(t *testing.T) {
+		lcCmd := cmd.NewLcCmd(dirname)
+		lcCmd.SetArgs([]string{"-r"})
+		lcCmd.Execute()
+		b, err := lcCmd.Flags().GetBool("raw")
+		if assert.NoError(t, err, "LcCmd should have a raw flag") {
+			assert.True(t, b, "raw flag should be true if '-r' is specified in the args")
+		}
+	})
 }
