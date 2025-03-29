@@ -118,11 +118,11 @@ func TestLineCount(t *testing.T) {
 			expectedLineCount += 1
 		}
 
-		// // Create an empty file
-		// _, err = os.CreateTemp(dirname, "")
-		// if err != nil {
-		// 	t.Fatalf("Unable to `os.CreateTemp(\"%s\", \"\")`. Unable to execute tests. err: %v", dirname, err)
-		// }
+		// Create an empty file
+		_, err = os.CreateTemp(dirname, "")
+		if err != nil {
+			t.Fatalf("Unable to `os.CreateTemp(\"%s\", \"\")`. Unable to execute tests. err: %v", dirname, err)
+		}
 
 		lc, err := dirs.LineCount(dirname)
 
