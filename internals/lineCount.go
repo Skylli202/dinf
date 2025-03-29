@@ -1,11 +1,28 @@
 package internals
 
 import (
+	"fmt"
 	"io"
-	"io/fs"
+
+	"github.com/Skylli202/dinf/internals/dirs"
 )
 
-type LineCountOpts struct{}
+const (
+	LineCountFormat    = "Folder contains: %d lines.\n"
+	LineCountRawFormat = "%d\n"
+)
 
-func LineCount(writer io.Writer, fsys fs.FS, opts LineCountOpts) {
+type LineCountOpts struct {
+	Raw bool
+}
+
+func LineCount(writer io.Writer, dirname string, opts LineCountOpts) {
+	lc, _ := dirs.LineCount(dirname)
+
+	format := LineCountFormat
+	if opts.Raw {
+		format = LineCountRawFormat
+	}
+
+	fmt.Fprintf(writer, format, lc)
 }

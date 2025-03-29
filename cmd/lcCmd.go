@@ -1,14 +1,13 @@
 package cmd
 
 import (
-	"io/fs"
 	"os"
 
 	"github.com/Skylli202/dinf/internals"
 	"github.com/spf13/cobra"
 )
 
-func NewLcCmd(fsys fs.FS) *cobra.Command {
+func NewLcCmd(dirname string) *cobra.Command {
 	lcCmd := &cobra.Command{
 		Use:        "lc",
 		Aliases:    []string{"line_count", "lineCount", "LineCount", "Linecount", "linecount"},
@@ -18,18 +17,31 @@ func NewLcCmd(fsys fs.FS) *cobra.Command {
 		Args:       cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			w := cmd.OutOrStdout()
-			opts := internals.LineCountOpts{}
-			internals.LineCount(w, fsys, opts)
+
+			raw, err := cmd.Flags().GetBool("raw")
+			if err != nil {
+				return err
+			}
+			opts := internals.LineCountOpts{
+				Raw: raw,
+			}
+			internals.LineCount(w, dirname, opts)
 			return nil
 		},
 	}
+
+	lcCmd.Flags().BoolP(
+		"raw",
+		"r",
+		false,
+		"Output only the line count instead of a human friendly sentence.",
+	)
 
 	return lcCmd
 }
 
 func init() {
 	wd, _ := os.Getwd()
-	fsys := os.DirFS(wd)
-	lcCmd := NewLcCmd(fsys)
+	lcCmd := NewLcCmd(wd)
 	rootCmd.AddCommand(lcCmd)
 }
