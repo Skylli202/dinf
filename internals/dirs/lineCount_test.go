@@ -47,13 +47,12 @@ func TestLineCount(t *testing.T) {
 		}
 
 		// msg := "Flat file system: one file, one line"
-		// expectedLineCount := 1
+		expectedLineCount := 1
 
 		lc, err := dirs.LineCount(dirname)
-		_ = lc
 
 		require.Nil(t, err, fmt.Sprintf("LineCount should not return nil. Returned error: %v", err))
-		// require.Equal(t, expectedLineCount, lc, fmt.Sprintf("Line count does not match.\nTest case: %d - %q.\n", 999, msg))
+		require.Equal(t, expectedLineCount, lc, "LineCount does not match the expected line count.")
 	})
 	// dname, err := os.MkdirTemp("", "testlinecount")
 	// if err != nil {

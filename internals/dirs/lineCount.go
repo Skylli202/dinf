@@ -39,6 +39,7 @@ func LineCount(dirname string) (int, error) {
 			_, err := r.ReadBytes('\n')
 			fmt.Println("for...", lc, err)
 			if err != nil && errors.Is(err, io.EOF) {
+				lc += 1
 				break
 			} else if err != nil {
 				return 0, err
