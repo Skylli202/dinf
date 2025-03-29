@@ -3,7 +3,6 @@ package dirs
 import (
 	"bufio"
 	"errors"
-	"fmt"
 	"io"
 	"io/fs"
 	"os"
@@ -18,14 +17,13 @@ func LineCount(dirname string) (int, error) {
 	}
 
 	lc := 0
-	for i, d := range dirents {
+	for _, d := range dirents {
 		// Ignore directories, they don't have line per say.
 		if d.IsDir() {
 			continue
 		}
 
 		p := path.Join(dirname, d.Name())
-		fmt.Printf("[%d] %s\n", i, p)
 		f, err := os.Open(p)
 		// FIX: Implement test case for this error
 		if err != nil {
