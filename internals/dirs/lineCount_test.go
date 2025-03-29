@@ -46,8 +46,39 @@ func TestLineCount(t *testing.T) {
 			t.Fatalf("Unable to write to the test file. Unable to execute tests. err: %v", err)
 		}
 
-		// msg := "Flat file system: one file, one line"
 		expectedLineCount := 1
+
+		lc, err := dirs.LineCount(dirname)
+
+		require.Nil(t, err, fmt.Sprintf("LineCount should not return nil. Returned error: %v", err))
+		require.Equal(t, expectedLineCount, lc, "LineCount does not match the expected line count.")
+	})
+
+	t.Run("Flat file system - 4 file", func(t *testing.T) {
+		dirname, err := os.MkdirTemp("", "")
+		if err != nil {
+			t.Fatalf("Unable to `os.MkdirTemp(...)`. Unable to execute tests. err: %v", err)
+		}
+		defer os.RemoveAll(dirname)
+
+		expectedLineCount := 0
+		for range 3 {
+			file, err := os.CreateTemp(dirname, "")
+			if err != nil {
+				t.Fatalf("Unable to `os.CreateTemp(\"%s\", \"\")`. Unable to execute tests. err: %v", dirname, err)
+			}
+			_, err = fmt.Fprint(file, SINGLE_LINE)
+			if err != nil {
+				t.Fatalf("Unable to write to the test file. Unable to execute tests. err: %v", err)
+			}
+			expectedLineCount += 1
+		}
+
+		// // Create an empty file
+		// _, err = os.CreateTemp(dirname, "")
+		// if err != nil {
+		// 	t.Fatalf("Unable to `os.CreateTemp(\"%s\", \"\")`. Unable to execute tests. err: %v", dirname, err)
+		// }
 
 		lc, err := dirs.LineCount(dirname)
 
