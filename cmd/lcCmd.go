@@ -10,43 +10,22 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func NewLcCmd(dirname string) *cobra.Command {
+func NewLcCmd() *cobra.Command {
 	lcCmd := &cobra.Command{
 		Use:        "lc",
 		Aliases:    []string{"line_count", "lineCount", "LineCount", "Linecount", "linecount"},
 		Example:    "dinf lc",
 		SuggestFor: []string{"cl"},
 		Short:      "Count lines in files of the current directory.",
-		Args:       cobra.MinimumNArgs(1),
-		PreRunE: func(cmd *cobra.Command, args []string) error {
-			p := args[0]
-			_, err := os.Stat(p)
+		Args:       cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			_, err := os.Stat(args[0])
 			if err != nil {
 				if errors.Is(err, fs.ErrNotExist) {
-					return fmt.Errorf("file, or directory, \"%s\" does not exist", p)
+					return fmt.Errorf("file, or directory, \"%s\" does not exist", args[0])
 				}
 				return err
 			}
-			args[0] = "/home/egouinguenet/"
-			// if path.IsAbs(p) {
-			// 	if fs.ValidPath(p) {
-			// 		fmt.Println(p, "is a valid and absolute path.")
-			// 	} else {
-			// 		fmt.Println(p, "is invalid and absolute path.")
-			// 	}
-			// } else {
-			// 	if fs.ValidPath(p) {
-			// 		fmt.Println(p, "is a valid and relative path.")
-			// 	} else {
-			// 		fmt.Println(p, "is invalid and relative path.")
-			// 	}
-			// }
-			// fmt.Println("Clean:", path.Clean(p))
-			//
-			return nil
-		},
-		RunE: func(cmd *cobra.Command, args []string) error {
-			fmt.Println("args[0]:", args[0])
 			w := cmd.OutOrStdout()
 
 			raw, err := cmd.Flags().GetBool("raw")
@@ -56,7 +35,9 @@ func NewLcCmd(dirname string) *cobra.Command {
 			opts := internals.LineCountOpts{
 				Raw: raw,
 			}
-			internals.LineCount(w, dirname, opts)
+
+			internals.LineCount(w, args[0], opts)
+
 			return nil
 		},
 	}
@@ -72,7 +53,6 @@ func NewLcCmd(dirname string) *cobra.Command {
 }
 
 func init() {
-	wd, _ := os.Getwd()
-	lcCmd := NewLcCmd(wd)
+	lcCmd := NewLcCmd()
 	rootCmd.AddCommand(lcCmd)
 }

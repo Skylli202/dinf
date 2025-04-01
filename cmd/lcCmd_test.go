@@ -17,14 +17,14 @@ func Test_NewLcCmd(t *testing.T) {
 	defer os.RemoveAll(dirname)
 
 	t.Run("LcCmd should have a raw flag of type Bool and default to false", func(t *testing.T) {
-		lcCmd := cmd.NewLcCmd(dirname)
+		lcCmd := cmd.NewLcCmd()
 		b, err := lcCmd.Flags().GetBool("raw")
 		lcCmd.Execute()
 		require.NoError(t, err, "LcCmd should have a `raw`, `-r` flag.")
 		require.False(t, b, "LcCmd's raw flag should be `false` by default.")
 	})
 	t.Run("--raw should pass the flag raw to true", func(t *testing.T) {
-		lcCmd := cmd.NewLcCmd(dirname)
+		lcCmd := cmd.NewLcCmd()
 		lcCmd.SetArgs([]string{"--raw"})
 		lcCmd.Execute()
 		b, err := lcCmd.Flags().GetBool("raw")
@@ -33,7 +33,7 @@ func Test_NewLcCmd(t *testing.T) {
 		}
 	})
 	t.Run("-r should pass the flag raw to true", func(t *testing.T) {
-		lcCmd := cmd.NewLcCmd(dirname)
+		lcCmd := cmd.NewLcCmd()
 		lcCmd.SetArgs([]string{"-r"})
 		lcCmd.Execute()
 		b, err := lcCmd.Flags().GetBool("raw")
