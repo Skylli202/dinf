@@ -14,9 +14,9 @@ func NewLcCmd() *cobra.Command {
 	lcCmd := &cobra.Command{
 		Use:        "lc",
 		Aliases:    []string{"line_count", "lineCount", "LineCount", "Linecount", "linecount"},
-		Example:    "dinf lc",
+		Example:    "dinf lc ./path/to/dirOrFile",
 		SuggestFor: []string{"cl"},
-		Short:      "Count lines in files of the current directory.",
+		Short:      "Count lines in a directory, or a single file.",
 		Args:       cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			_, err := os.Stat(args[0])

@@ -11,6 +11,8 @@ It is a (very) small CLI application that:
 - Size of the current working directory
   - (opt.) Size the files recursively.
   - (opt.) Output only the file count instead of a human friendly sentence
+- Count lines in a directory, or a single file.
+  - (opt.) Output only the file count instead of a human friendly sentence
 
 ... many more features to come
 
